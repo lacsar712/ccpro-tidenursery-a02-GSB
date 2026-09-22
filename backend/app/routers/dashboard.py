@@ -8,6 +8,7 @@ from app.auth import get_current_user
 from app.database import get_db
 from app.models.feed_event import FeedEvent
 from app.models.pond import Pond
+from app.models.rotifer_tank import RotiferTank, TANK_STATUS_CULTURING
 from app.models.user import User
 from app.models.water_sample import WaterSample
 from app.schemas.dashboard import DashboardStats
@@ -37,9 +38,16 @@ def get_stats(
         .scalar()
         or 0.0
     )
+    active_tank_count = (
+        db.query(func.count(RotiferTank.id))
+        .filter(RotiferTank.status == TANK_STATUS_CULTURING)
+        .scalar()
+        or 0
+    )
     return DashboardStats(
         pond_total=pond_total,
         quarantine_count=quarantine_count,
         samples_last_24h=samples_last_24h,
         feed_kg_last_7d=float(feed_kg_last_7d),
+        active_tank_count=active_tank_count,
     )

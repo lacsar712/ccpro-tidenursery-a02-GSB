@@ -5,6 +5,8 @@ from app.database import SessionLocal
 from app.models.feed_event import FeedEvent
 from app.models.hatchery import Hatchery
 from app.models.pond import Pond
+from app.models.rotifer_harvest import RotiferHarvest
+from app.models.rotifer_tank import RotiferTank, TANK_STATUS_CULTURING
 from app.models.user import User
 from app.models.water_sample import WaterSample
 
@@ -73,7 +75,13 @@ def seed() -> None:
                 volume_m3=45.0,
                 status="dry",
             )
-            db.add_all([p1, p2, p3, p4])
+            rt1 = RotiferTank(
+                hatchery_id=h2.id,
+                tank_code="RT-01",
+                inoculum_density=120.0,
+                status=TANK_STATUS_CULTURING,
+            )
+            db.add_all([p1, p2, p3, p4, rt1])
             db.flush()
 
             now = datetime.now(timezone.utc)
@@ -125,6 +133,26 @@ def seed() -> None:
                         fed_at=now - timedelta(days=2),
                         feed_type="微藻饲料",
                         amount_kg=2.5,
+                        operator_name="水质技术员",
+                    ),
+                ]
+            )
+            # 一次 6 kg 的大额收获（>5 kg）：随收获同事务写一条轮虫鲜料投喂，
+            # 去向塘口 B-01 与扩培缸 RT-01 同属盐田青湾育苗场
+            seeded_harvest_at = now - timedelta(hours=2)
+            db.add_all(
+                [
+                    RotiferHarvest(
+                        tank_id=rt1.id,
+                        amount_kg=6.0,
+                        harvested_at=seeded_harvest_at,
+                        destination_pond_id=p3.id,
+                    ),
+                    FeedEvent(
+                        pond_id=p3.id,
+                        fed_at=seeded_harvest_at,
+                        feed_type="轮虫鲜料",
+                        amount_kg=6.0,
                         operator_name="水质技术员",
                     ),
                 ]

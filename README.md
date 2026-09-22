@@ -46,11 +46,28 @@ docker compose up --build
 3. **Pond 育苗塘**：`hatcheryId`、`pondCode`、`species`、`volumeM3`、`status(stocked|dry|quarantine)`；同场 `pondCode` 唯一
 4. **WaterSample 水质样**：`pondId`、`sampledAt`、`tempC`、`salinityPpt`、`doMgL`、`ph`、`notes`；`doMgL > 0` 且 `ph ∈ [6,9]`，否则返回 **400**
 5. **FeedEvent 投喂**：`pondId`、`fedAt`、`feedType`、`amountKg`、`operatorName`
-6. **Dashboard**：塘总数、quarantine 数、近 24h 采样数、近 7 日投喂总量 kg
+6. **RotiferTank 轮虫扩培缸**：`hatcheryId`、`tankCode`、`inoculumDensity`、`status(culturing|cleaned)`；扩培缸挂场，同场 `tankCode` 唯一
+7. **RotiferHarvest 收获行**：`tankId`、`amountKg`、`harvestedAt`、`destinationPondId`（可空）；去向塘口若填必须与扩培缸同场，否则 **400**
+8. **Dashboard**：塘总数、quarantine 数、近 24h 采样数、近 7 日投喂总量 kg、培养中扩培缸数（与扩培缸列表 `culturing` 行数一致）
+
+### 轮虫扩培业务规则
+
+- **建缸 / 收获**：登录技术员与场长均可操作；新缸默认 `culturing 培养中`。
+- **清缸**：仅场长（`admin`）可执行，技术员调用返回 **403**；清缸后状态为 `cleaned 已清缸`，禁止再登记收获（**400**）。
+- **大额收获联动投喂**：单次收获量 **超过 5 kg** 时，必须指定与扩培缸**同一场**的去向塘口（空塘口直接 **400**），并与收获行在**同一数据库事务**内写入一条投喂事件：
+  - 饵料类型固定 `轮虫鲜料`
+  - 投喂重量 = 收获千克，投喂时刻 = 收获时刻
+  - 操作人 = 当前登录用户的显示名
+- 单次收获 ≤ 5 kg 时去向塘口可空，不产生投喂。
+- 收获与投喂同事务提交：投喂写入失败则收获一并回滚，**不会出现收获成功却漏写投喂**。
 
 ## 前端页面
 
-Login · Dashboard · Hatcheries · Ponds · WaterSamples · FeedEvents
+Login · Dashboard · Hatcheries · Ponds · WaterSamples · FeedEvents · RotiferTanks（侧栏「轮虫扩培」）
+
+### 种子数据
+
+种子含 1 个培养中扩培缸「RT-01」（盐田青湾育苗场，接种密度 120 个/mL），并已准备一次 **6 kg** 的大额收获，去向为同场塘口 B-01，同时写入一条对应的「轮虫鲜料」投喂事件，启动后即可在轮虫扩培页与投喂事件页查看联动结果。
 
 ## 本地开发（可选）
 

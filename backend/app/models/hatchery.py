@@ -17,3 +17,6 @@ class Hatchery(Base):
     ponds: Mapped[List["Pond"]] = relationship(
         "Pond", back_populates="hatchery", cascade="all, delete-orphan"
     )
+    rotifer_tanks: Mapped[List["RotiferTank"]] = relationship(
+        "RotiferTank", back_populates="hatchery", cascade="all, delete-orphan"
+    )

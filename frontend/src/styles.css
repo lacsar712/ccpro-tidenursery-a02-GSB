@@ -225,7 +225,7 @@ th {
 
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   margin-top: 20px;
 }
@@ -276,6 +276,39 @@ th {
 .badge.stocked {
   background: #e3f7f4;
   color: #1a7a6c;
+}
+
+.badge.culturing {
+  background: #e3f7f4;
+  color: #1a7a6c;
+}
+
+.badge.cleaned {
+  background: #edf0f2;
+  color: #607078;
+}
+
+.harvest-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.harvest-form input,
+.harvest-form select {
+  padding: 8px 10px;
+  min-width: 120px;
+}
+
+.harvest-form .btn {
+  padding: 8px 12px;
+}
+
+.harvest-row {
+  font-size: 13px;
+  white-space: nowrap;
+  padding: 2px 0;
 }
 
 .login-page {
