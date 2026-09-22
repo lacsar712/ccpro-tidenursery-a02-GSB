@@ -46,11 +46,20 @@ docker compose up --build
 3. **Pond 育苗塘**：`hatcheryId`、`pondCode`、`species`、`volumeM3`、`status(stocked|dry|quarantine)`；同场 `pondCode` 唯一
 4. **WaterSample 水质样**：`pondId`、`sampledAt`、`tempC`、`salinityPpt`、`doMgL`、`ph`、`notes`；`doMgL > 0` 且 `ph ∈ [6,9]`，否则返回 **400**
 5. **FeedEvent 投喂**：`pondId`、`fedAt`、`feedType`、`amountKg`、`operatorName`
-6. **Dashboard**：塘总数、quarantine 数、近 24h 采样数、近 7 日投喂总量 kg
+6. **RotiferTank 轮虫扩培缸**：`hatcheryId`、`tankCode`、`inoculationDensity`、`status(culturing|cleared)`；同场 `tankCode` 唯一
+7. **RotiferHarvest 收获行**：`tankId`、`amountKg`、`harvestedAt`、`pondId(可空)`；去向塘口若填必须属于同场
+8. **Dashboard**：塘总数、quarantine 数、近 24h 采样数、近 7 日投喂总量 kg、培养中扩培缸数
+
+### 轮虫扩培业务规则
+
+- 仅 `culturing`（培养中）的缸允许登记收获；`cleared`（已清缸）禁止再收获（**400**）
+- 单次收获 **> 5 kg** 时：必须选择去向塘口，且与收获行**同一事务**写入一条投喂事件——`feedType` 固定 `轮虫鲜料`，`amountKg`/`fedAt` 与收获一致，`operatorName` 取当前登录显示名；任一写入失败则整体回滚，不会出现“收获成功却漏写投喂”
+- 去向塘口为空时禁止上述大额收获（**400**）
+- 技术员可建缸与登记收获；**清缸仅场长**，其余角色返回 **403**
 
 ## 前端页面
 
-Login · Dashboard · Hatcheries · Ponds · WaterSamples · FeedEvents
+Login · Dashboard · Hatcheries · Ponds · WaterSamples · FeedEvents · RotiferTanks（侧栏「轮虫扩培」）
 
 ## 本地开发（可选）
 

@@ -278,6 +278,22 @@ th {
   color: #1a7a6c;
 }
 
+.badge.culturing {
+  background: #e3f7f4;
+  color: #1a7a6c;
+}
+
+.badge.cleared {
+  background: #edf0f2;
+  color: #607078;
+}
+
+.section-title {
+  margin: 24px 0 12px;
+  font-size: 18px;
+  color: var(--sea-deep);
+}
+
 .login-page {
   min-height: 100vh;
   display: grid;

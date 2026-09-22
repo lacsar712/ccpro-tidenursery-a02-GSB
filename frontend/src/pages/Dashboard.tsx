@@ -38,6 +38,10 @@ export default function Dashboard() {
             {stats ? stats.feedKgLast7d.toFixed(2) : '—'}
           </div>
         </div>
+        <div className="stat-card">
+          <div className="stat-label">培养中扩培缸</div>
+          <div className="stat-value">{stats?.culturingTanks ?? '—'}</div>
+        </div>
       </div>
     </div>
   )

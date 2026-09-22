@@ -5,6 +5,7 @@ from app.database import SessionLocal
 from app.models.feed_event import FeedEvent
 from app.models.hatchery import Hatchery
 from app.models.pond import Pond
+from app.models.rotifer import RotiferHarvest, RotiferTank
 from app.models.user import User
 from app.models.water_sample import WaterSample
 
@@ -76,7 +77,35 @@ def seed() -> None:
             db.add_all([p1, p2, p3, p4])
             db.flush()
 
+            t1 = RotiferTank(
+                hatchery_id=h1.id,
+                tank_code="R-01",
+                inoculation_density=120.0,
+                status="culturing",
+            )
+            db.add(t1)
+            db.flush()
+
             now = datetime.now(timezone.utc)
+            harvest_at = now - timedelta(hours=6)
+            db.add_all(
+                [
+                    # 一次 6.5 kg 的大额收获：按规则同事务联动一条轮虫鲜料投喂事件
+                    RotiferHarvest(
+                        tank_id=t1.id,
+                        amount_kg=6.5,
+                        harvested_at=harvest_at,
+                        pond_id=p1.id,
+                    ),
+                    FeedEvent(
+                        pond_id=p1.id,
+                        fed_at=harvest_at,
+                        feed_type="轮虫鲜料",
+                        amount_kg=6.5,
+                        operator_name="水质技术员",
+                    ),
+                ]
+            )
             db.add_all(
                 [
                     WaterSample(

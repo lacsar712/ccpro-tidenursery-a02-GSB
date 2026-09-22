@@ -41,9 +41,26 @@ export type FeedEvent = {
   operatorName: string
 }
 
+export type RotiferTank = {
+  id: number
+  hatcheryId: number
+  tankCode: string
+  inoculationDensity: number
+  status: 'culturing' | 'cleared'
+}
+
+export type RotiferHarvest = {
+  id: number
+  tankId: number
+  amountKg: number
+  harvestedAt: string
+  pondId?: number | null
+}
+
 export type DashboardStats = {
   pondTotal: number
   quarantineCount: number
   samplesLast24h: number
   feedKgLast7d: number
+  culturingTanks: number
 }
